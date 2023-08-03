@@ -4,13 +4,10 @@
  */
 package cfh.jcrane.gui;
 
-import static java.awt.GridBagConstraints.BASELINE_LEADING;
-import static java.awt.GridBagConstraints.HORIZONTAL;
-import static java.awt.GridBagConstraints.NONE;
-import static java.awt.GridBagConstraints.RELATIVE;
-import static java.awt.GridBagConstraints.REMAINDER;
-import static java.util.Objects.requireNonNull;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.awt.GridBagConstraints.*;
+import static java.util.Objects.*;
+import static java.util.concurrent.TimeUnit.*;
+import static javax.swing.JOptionPane.*;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -26,7 +23,6 @@ import java.util.function.Consumer;
 
 import javax.swing.AbstractAction;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -74,32 +70,42 @@ public class WorldPanel extends JPanel {
     }
 
     private void typedReturn(ActionEvent e) {
-        if (!world.crane().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Crane not empty");
-            return;
-        }
-        var insets = new Insets(0, 0, 0, 0);
-        var cLabel = new GridBagConstraints(0, RELATIVE, 1, 1, 0.0, 0.0, BASELINE_LEADING, NONE, insets, 0, 0);
-        var cField = new GridBagConstraints(1, RELATIVE, REMAINDER, 1, 0.0, 0.0, BASELINE_LEADING, HORIZONTAL, insets, 0, 0);
-        var panel = new JPanel(new GridBagLayout());
-        
-        var width = new JTextField(10);
-        panel.add(new JLabel("Width:"), cLabel);
-        panel.add(width, cField);
-        
-        var height = new JTextField(10);
-        panel.add(new JLabel("Height:"), cLabel);
-        panel.add(height, cField);
-        
-        var opt = JOptionPane.showConfirmDialog(this, panel, "Create Block", JOptionPane.OK_CANCEL_OPTION);
-        if (opt == JOptionPane.OK_OPTION) {
-            try {
-                var w = Integer.parseInt(width.getText());
-                var h = Integer.parseInt(height.getText());
-                var b = new Block.Rect("", Color.RED, w, h);  // TODO name and color
-                world.crane().pick(b);
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "invalid dimensions");
+        // TODO only at home? top?
+        var crane = world.crane();
+        if (crane.isEmpty()) {
+
+            var insets = new Insets(0, 0, 0, 0);
+            var cLabel = new GridBagConstraints(0, RELATIVE, 1, 1, 0.0, 0.0, BASELINE_LEADING, NONE, insets, 0, 0);
+            var cField = new GridBagConstraints(1, RELATIVE, REMAINDER, 1, 0.0, 0.0, BASELINE_LEADING, HORIZONTAL, insets, 0, 0);
+            var panel = new JPanel(new GridBagLayout());
+
+            var width = new JTextField(10);
+            panel.add(new JLabel("Width:"), cLabel);
+            panel.add(width, cField);
+
+            var height = new JTextField(10);
+            panel.add(new JLabel("Height:"), cLabel);
+            panel.add(height, cField);
+
+            var opt = showConfirmDialog(this, panel, "Create Block", OK_CANCEL_OPTION);
+            if (opt == OK_OPTION) {
+                try {
+                    var w = Integer.parseInt(width.getText());
+                    var h = Integer.parseInt(height.getText());
+                    var b = new Block.Rect(0, 0, "", Color.RED, w, h);  // TODO name and color
+                    if (crane.canPick(b, getWidth(), getHeight()) && world.canCreate(b)) {
+                        crane.pick(b);
+                    } else {
+                        showMessageDialog(this, "Block is too big", "Error", ERROR_MESSAGE);
+                    }
+                } catch (NumberFormatException ex) {
+                    showMessageDialog(this, "invalid dimensions");
+                }
+            }
+        } else {
+            var opt = showConfirmDialog(this, "Drop block", "Confirm", YES_NO_OPTION); // TODO block name
+            if (opt == YES_OPTION) {
+                crane.drop();
             }
         }
     }

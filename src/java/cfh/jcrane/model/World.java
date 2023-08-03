@@ -12,8 +12,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.RepaintManager;
-
 import cfh.jcrane.Settings;
 
 /**
@@ -36,6 +34,16 @@ public class World {
     public Crane crane() { return crane; }
     
     public Collection<Block> blocks() { return Collections.unmodifiableCollection(blocks); }
+    
+    public boolean canCreate(Block block) {
+        var bound = block.bound();
+        for (var b: blocks) {
+            if (b.intersects(bound)) {
+                return false;
+            }
+        }
+        return true;
+    }
     
     public void update(int width, int height) {
         var settings = Settings.instance();

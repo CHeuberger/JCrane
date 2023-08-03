@@ -20,14 +20,18 @@ public sealed abstract class Block {
     protected int x;
     protected int y;
     
-    protected Block(String name, Color color) {
+    protected Block(int x, int y, String name, Color color) {
         assert name != null;
         assert color != null;
+        
+        this.x = x;
+        this.y = y;
         this.name = name;
         this.color = color;
     }
     
     protected abstract int height();
+    protected abstract Rectangle bound();
     protected abstract boolean intersects(Rectangle bound);
     
     protected abstract void moveTop(int x2, int y2);
@@ -41,8 +45,8 @@ public sealed abstract class Block {
         private final int width;
         private final int height;
         
-        public Rect(String name, Color color, int width, int height) {
-            super(name, color);
+        public Rect(int x, int y, String name, Color color, int width, int height) {
+            super(x, y, name, color);
             if (width <= 0) throw new IllegalArgumentException("invalid width: " + width);
             if (height <= 0) throw new IllegalArgumentException("invalid height: " + height);
             this.width = width;
@@ -52,6 +56,11 @@ public sealed abstract class Block {
         @Override
         protected int height() {
             return height;
+        }
+        
+        @Override
+        protected Rectangle bound() {
+            return new Rectangle(x, y, width, height);
         }
         
         @Override

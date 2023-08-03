@@ -5,9 +5,12 @@
 package cfh.jcrane.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import cfh.jcrane.model.Block;
 import cfh.jcrane.model.Crane;
 import cfh.jcrane.model.World;
 
@@ -24,6 +27,9 @@ public class GUI {
     private GUI(String... args) {
         var crane = new Crane();
         var world = new World(crane);
+        
+        // XXX
+        world.add(new Block.Rect(0, 0, "1", Color.YELLOW, 40, 40));
         
         var worldPanel = new WorldPanel(world);
         

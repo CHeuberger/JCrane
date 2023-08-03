@@ -11,7 +11,6 @@ import java.awt.Rectangle;
 import java.util.Collection;
 
 import cfh.jcrane.Settings;
-import cfh.jcrane.model.Block.Rect;
 
 /**
  * @author Carlos F. Heuberger, 2023-08-02
@@ -30,17 +29,32 @@ public class Crane {
     private Dir horizontal = STOP;
     private Dir vertical = STOP;
     
-    
 
     public boolean isEmpty() {
         return block == null;
     }
+    
+    public boolean canPick(Block b, int width, int height) {
+        var settings = Settings.instance();
+        var gap = settings.gap();
+        var h = height - gap.top - settings.tableHeight() - gap.bottom;
+        b.moveTop(x+settings.craneHeight()/2, h-y);
+        return y+b.height() < h;
+    }
 
-    public void pick(Rect b) {
-        if (block != null) {
+    public void pick(Block b) {
+        if (b == null)
+            throw new IllegalArgumentException("b: null");
+        if (block != null)
             throw new IllegalArgumentException("unable to pickup " + b + ", already loaded: " + block);
-        }
+
         block = b;
+    }
+    
+    public void drop() {
+        if (block == null)
+            throw new IllegalArgumentException("nothing to drop");
+        block = null;
     }
 
     public void paint(Graphics2D gg) {
@@ -94,6 +108,16 @@ public class Crane {
             if (b != block && b.intersects(bound)) {
                 stop();
                 return;
+            }
+        }
+        if (block != null) {
+            bound = block.bound();
+            bound.translate(nx-x, y-ny);
+            for (var b : blocks) {
+                if (b != block && b.intersects(bound)) {
+                    stop(); 
+                    return;
+                }
             }
         }
 
