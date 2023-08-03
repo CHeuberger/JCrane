@@ -27,7 +27,10 @@ public sealed abstract class Block {
         this.color = color;
     }
     
+    protected abstract int height();
     protected abstract boolean intersects(Rectangle bound);
+    
+    protected abstract void moveTop(int x2, int y2);
     
     protected abstract void paint(Graphics2D gg);
 
@@ -47,8 +50,19 @@ public sealed abstract class Block {
         }
         
         @Override
+        protected int height() {
+            return height;
+        }
+        
+        @Override
         protected boolean intersects(Rectangle bound) {
             return bound.intersects(x, y, width, height);
+        }
+        
+        @Override
+        protected void moveTop(int tx, int ty) {
+            y = ty - height;
+            x = tx - width/2;
         }
 
         @Override

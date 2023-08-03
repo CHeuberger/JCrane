@@ -4,21 +4,35 @@
  */
 package cfh.jcrane.gui;
 
-import static java.util.Objects.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.awt.GridBagConstraints.BASELINE_LEADING;
+import static java.awt.GridBagConstraints.HORIZONTAL;
+import static java.awt.GridBagConstraints.NONE;
+import static java.awt.GridBagConstraints.RELATIVE;
+import static java.awt.GridBagConstraints.REMAINDER;
+import static java.util.Objects.requireNonNull;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.function.Consumer;
 
 import javax.swing.AbstractAction;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+
 import cfh.jcrane.Settings;
+import cfh.jcrane.model.Block;
 import cfh.jcrane.model.Crane.Dir;
 import cfh.jcrane.model.World;
 
@@ -60,7 +74,34 @@ public class WorldPanel extends JPanel {
     }
 
     private void typedReturn(ActionEvent e) {
-        // TODO
+        if (!world.crane().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Crane not empty");
+            return;
+        }
+        var insets = new Insets(0, 0, 0, 0);
+        var cLabel = new GridBagConstraints(0, RELATIVE, 1, 1, 0.0, 0.0, BASELINE_LEADING, NONE, insets, 0, 0);
+        var cField = new GridBagConstraints(1, RELATIVE, REMAINDER, 1, 0.0, 0.0, BASELINE_LEADING, HORIZONTAL, insets, 0, 0);
+        var panel = new JPanel(new GridBagLayout());
+        
+        var width = new JTextField(10);
+        panel.add(new JLabel("Width:"), cLabel);
+        panel.add(width, cField);
+        
+        var height = new JTextField(10);
+        panel.add(new JLabel("Height:"), cLabel);
+        panel.add(height, cField);
+        
+        var opt = JOptionPane.showConfirmDialog(this, panel, "Create Block", JOptionPane.OK_CANCEL_OPTION);
+        if (opt == JOptionPane.OK_OPTION) {
+            try {
+                var w = Integer.parseInt(width.getText());
+                var h = Integer.parseInt(height.getText());
+                var b = new Block.Rect("", Color.RED, w, h);  // TODO name and color
+                world.crane().pick(b);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "invalid dimensions");
+            }
+        }
     }
     
     private void pressedRight(ActionEvent e) {
