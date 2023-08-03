@@ -37,8 +37,13 @@ public class World {
     
     public Collection<Block> blocks() { return Collections.unmodifiableCollection(blocks); }
     
-    public void update() {
-        crane.update();
+    public void update(int width, int height) {
+        var settings = Settings.instance();
+        var gap = settings.gap();
+        crane.update(
+              width-gap.left-gap.right
+            , height-gap.top-settings.tableHeight()-gap.bottom
+            , blocks());
     }
 
     public void paint(Graphics2D gg) {

@@ -74,7 +74,7 @@ public class WorldPanel extends JPanel {
     }
     
     private void update() {
-        world.update();
+        world.update(getWidth(), getHeight());
         repaint();
     }
 
