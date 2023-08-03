@@ -12,6 +12,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.function.Consumer;
 
 import javax.swing.AbstractAction;
@@ -32,6 +33,7 @@ public class WorldPanel extends JPanel {
     WorldPanel(World world) {
         this.world = requireNonNull(world, "world: null");
 
+        registerKeyAction("typed \n", this::typedReturn);
         registerKeyAction("pressed RIGHT", this::pressedRight);
         registerKeyAction("released RIGHT", this::releasedHorz);
         registerKeyAction("pressed LEFT", this::pressedLeft);
@@ -41,7 +43,15 @@ public class WorldPanel extends JPanel {
         registerKeyAction("pressed DOWN", this::pressedDown);
         registerKeyAction("released DOWN", this::releasedVert);
         
-        Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(this::update, 200, 10, MILLISECONDS);
+        var factory = new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                var thread = new Thread(r, "Animation");
+                thread.setDaemon(true);
+                return thread;
+            }
+        };
+        Executors.newSingleThreadScheduledExecutor(factory).scheduleWithFixedDelay(this::update, 200, 10, MILLISECONDS);
     }
 
     @Override
@@ -49,6 +59,10 @@ public class WorldPanel extends JPanel {
         return Settings.instance().preferredSize();
     }
 
+    private void typedReturn(ActionEvent e) {
+        // TODO
+    }
+    
     private void pressedRight(ActionEvent e) {
         world.crane().moveHorz(Dir.RIGHT);
     }

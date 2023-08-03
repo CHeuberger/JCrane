@@ -5,11 +5,9 @@
 package cfh.jcrane.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import cfh.jcrane.model.Block;
 import cfh.jcrane.model.Crane;
 import cfh.jcrane.model.World;
 
@@ -27,15 +25,14 @@ public class GUI {
         var crane = new Crane();
         var world = new World(crane);
         
-        // TODO TEST
-        world.add(new Block.Rect("", Color.RED, 50, 50));
-        world.add(new Block.Rect("", Color.YELLOW, 20, 20));
-        
         var worldPanel = new WorldPanel(world);
+        
+        var layout = new BorderLayout();
         
         var frame = new JFrame("JCrane");
         frame.setDefaultCloseOperation(frame.DISPOSE_ON_CLOSE);
-        frame.add(worldPanel, BorderLayout.CENTER);
+        frame.setLayout(layout);
+        frame.add(worldPanel, layout.CENTER);
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);

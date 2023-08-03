@@ -26,7 +26,7 @@ public class Settings {
         //
     }
     
-    public Dimension preferredSize() { return new Dimension(800, 600); }
+    public Dimension preferredSize() { return new Dimension(800, 500); }
     public Insets gap() { return new Insets(10, 10, 0, 10); }
 
     public Color worldBackground() { return LIGHT_GRAY; }
@@ -38,7 +38,8 @@ public class Settings {
     public int craneHalfBase() { return 7; }
     public int craneMinHorz() { return craneHeight() + craneHalfBase(); }
     public int craneMinVert() { return 20; }
-    public Color craneColor() { return BLUE.darker(); }
+    public Color craneColor() { return GRAY.darker(); }
+    public Color craneBaseColor() { return BLACK; }
 
     public int horizontalVel() { return 2; }
     public int verticalVel() { return 2; }

@@ -6,7 +6,6 @@ package cfh.jcrane.model;
 
 import static cfh.jcrane.model.Crane.Dir.*;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.Collection;
@@ -26,11 +25,9 @@ public class Crane {
     private int x = Settings.instance().craneMinHorz();
     private int y = Settings.instance().craneMinVert();
 
-    private Block block;
+    private Block block = null;
     private Dir horizontal = STOP;
     private Dir vertical = STOP;
-    
-    private Rectangle bound = null; // XXX
     
     public void paint(Graphics2D gg) {
         var settings = Settings.instance();
@@ -41,13 +38,8 @@ public class Crane {
         gg.setColor(settings.craneColor());
         gg.fillRect(0, h-settings.craneHeight(), w, settings.craneHeight());
         gg.fillRect(x, h-y, settings.craneHeight(), y);
+        gg.setColor(settings.craneBaseColor());
         gg.fillRect(x-settings.craneHalfBase(), h-y, base, settings.craneHeight());
-        
-        // XXX
-        if (bound != null) {
-            gg.setColor(Color.YELLOW);
-            gg.draw(bound);
-        }
     }
 
     void update(int width, int height, Collection<Block> blocks) {
@@ -75,9 +67,9 @@ public class Crane {
         }
         
         var base = settings.craneHeight() + 2 * settings.craneHalfBase();
-        bound = new Rectangle(nx-settings.craneHalfBase(), height-ny, base, ny);
-        for (var block : blocks) {
-            if (block.intersects(bound)) {
+        var bound = new Rectangle(nx-settings.craneHalfBase()-1, height-ny, base, ny);
+        for (var b : blocks) {
+            if (b != block && b.intersects(bound)) {
                 stop();
                 return;
             }
